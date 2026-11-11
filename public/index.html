@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AnyBaek | 일을 맡길 수 있는 AI 직원, AX(AI 전환) 에이전트</title>
+<meta name="description" content="AnyBaek은 일을 대신하는 AI 에이전트로 AX(AI 전환)를 돕습니다. 고객 응대를 맡는 샛별, 사이트 이용을 안내하는 AI 웹 이용 도우미, 재고와 주문을 챙기는 비즈니스 AX를 준비하고 있어요.">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<link rel="canonical" href="https://anybaek.com/">
+<meta name="theme-color" content="#ffffff">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AnyBaek">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:url" content="https://anybaek.com/">
+<meta property="og:title" content="AnyBaek | 일을 맡길 수 있는 AI 직원">
+<meta property="og:description" content="고객 응대, 사이트 안내, 재고와 주문까지. 일을 대신하는 AI 에이전트로 AX(AI 전환)를 도와요.">
+<meta property="og:image" content="https://anybaek.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AnyBaek, 일을 맡길 수 있는 AI 직원을 만들어요">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AnyBaek | 일을 맡길 수 있는 AI 직원">
+<meta name="twitter:description" content="고객 응대, 사이트 안내, 재고와 주문까지. 일을 대신하는 AI 에이전트로 AX(AI 전환)를 도와요.">
+<meta name="twitter:image" content="https://anybaek.com/og.png">
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="AnyBaek 요약 (llms.txt)">
+<link rel="stylesheet" href="/fonts/WantedSansVariable.css">
+<link rel="stylesheet" href="/styles.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://anybaek.com/#organization",
+      "name": "AnyBaek",
+      "alternateName": "애니백",
+      "url": "https://anybaek.com/",
+      "logo": "https://anybaek.com/apple-touch-icon.png",
+      "email": "contact@anybaek.com",
+      "description": "AnyBaek은 일을 대신하는 AI 에이전트(AI 직원)를 만들어 사업자와 기관의 AX(AI 전환)를 돕습니다.",
+      "knowsAbout": ["AX", "AI 전환", "AI 에이전트", "AI 직원", "MCP Tool", "고객 응대 자동화", "웹 접근성"],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "sales",
+        "email": "contact@anybaek.com",
+        "availableLanguage": "ko"
+      },
+      "sameAs": ["https://satbyul.com/"]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://anybaek.com/#website",
+      "url": "https://anybaek.com/",
+      "name": "AnyBaek",
+      "inLanguage": "ko-KR",
+      "publisher": { "@id": "https://anybaek.com/#organization" }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://anybaek.com/#webpage",
+      "url": "https://anybaek.com/",
+      "name": "AnyBaek | 일을 맡길 수 있는 AI 직원, AX(AI 전환) 에이전트",
+      "description": "AnyBaek은 일을 대신하는 AI 에이전트로 AX(AI 전환)를 돕습니다. 고객 응대를 맡는 샛별, 사이트 이용을 안내하는 AI 웹 이용 도우미, 재고와 주문을 챙기는 비즈니스 AX를 준비하고 있어요.",
+      "inLanguage": "ko-KR",
+      "isPartOf": { "@id": "https://anybaek.com/#website" },
+      "about": { "@id": "https://anybaek.com/#organization" },
+      "dateModified": "2026-11-11",
+      "primaryImageOfPage": "https://anybaek.com/og.png"
+    },
+    {
+      "@type": "ItemList",
+      "@id": "https://anybaek.com/#services",
+      "name": "AnyBaek이 준비하는 AI 에이전트",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "item": {
+            "@type": "Service",
+            "@id": "https://anybaek.com/#satbyul",
+            "name": "샛별",
+            "url": "https://satbyul.com/",
+            "serviceType": "고객 응대 AI 직원",
+            "description": "댓글, DM, 스토어 문의에 대신 답하는 AI 직원. 주문 내역을 직접 조회해서 답변을 만들어 보내고, 사람이 봐야 하는 문의만 담당자에게 넘깁니다. 첫 버전은 인스타그램과 스마트스토어에 적용하고 있습니다.",
+            "provider": { "@id": "https://anybaek.com/#organization" },
+            "areaServed": "KR"
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "item": {
+            "@type": "Service",
+            "@id": "https://anybaek.com/#helper",
+            "name": "AI 웹 이용 도우미",
+            "url": "https://anybaek.com/#helper",
+            "serviceType": "고령자를 위한 웹 이용 안내 에이전트",
+            "description": "공공기관 사이트나 어르신이 자주 찾는 사이트에 붙이는 AI 도우미. 하고 싶은 일을 말하면 어느 메뉴로 가야 하는지, 다음에 무엇을 하면 되는지 한 단계씩 안내합니다.",
+            "provider": { "@id": "https://anybaek.com/#organization" },
+            "audience": { "@type": "Audience", "audienceType": "공공기관, 고령자가 이용하는 사이트 운영 기관" },
+            "areaServed": "KR"
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "item": {
+            "@type": "Service",
+            "@id": "https://anybaek.com/#ax",
+            "name": "비즈니스 AX",
+            "url": "https://anybaek.com/#ax",
+            "serviceType": "사업 운영 AI 에이전트",
+            "description": "재고, 주문, 환불 같은 업무 데이터를 직접 확인하고 필요한 일을 이어서 처리하는 AI 에이전트. 쓰고 있는 서비스에 전용 도구(MCP Tool)를 만들어 연결하며, 첫 버전은 스마트스토어에 적용하고 있습니다.",
+            "provider": { "@id": "https://anybaek.com/#organization" },
+            "areaServed": "KR"
+          }
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://anybaek.com/#faq",
+      "inLanguage": "ko-KR",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "AnyBaek은 무엇을 하나요?",
+          "acceptedAnswer": { "@type": "Answer", "text": "AnyBaek은 일을 대신하는 AI 에이전트, 곧 AI 직원을 만들어 사업자와 기관의 AX(AI 전환)를 도와요. 고객 응대를 맡는 샛별, 사이트 이용을 안내하는 AI 웹 이용 도우미, 재고와 주문을 챙기는 비즈니스 AX 세 가지를 준비하고 있어요." }
+        },
+        {
+          "@type": "Question",
+          "name": "지금 바로 쓸 수 있나요?",
+          "acceptedAnswer": { "@type": "Answer", "text": "세 사업 모두 출시를 준비하고 있어요. 샛별은 satbyul.com에서 가입 없이 먼저 둘러볼 수 있고, AI 웹 이용 도우미와 비즈니스 AX는 상담을 요청하시면 일정을 안내해 드려요." }
+        },
+        {
+          "@type": "Question",
+          "name": "AI 직원이 마음대로 주문하거나 답변을 보내지는 않나요?",
+          "acceptedAnswer": { "@type": "Answer", "text": "고르신 직급에 따라 달라요. 대리급은 고객 응대와 보고서 작성은 알아서 하고, 주문처럼 결재가 필요한 일은 확인을 받아요. 부장급은 주문도 알아서 하지만, 주문 최고 금액 같은 업무 범위를 미리 정해 둘 수 있어요." }
+        },
+        {
+          "@type": "Question",
+          "name": "AI 웹 이용 도우미를 넣으려면 사이트를 새로 만들어야 하나요?",
+          "acceptedAnswer": { "@type": "Answer", "text": "아니요. 지금 운영 중인 사이트에 도우미를 설치하는 방식이에요. 어떤 화면에서 무엇을 안내할지는 기관 담당자와 함께 정해요." }
+        },
+        {
+          "@type": "Question",
+          "name": "샛별을 쓰려면 인스타그램 계정이 꼭 필요한가요?",
+          "acceptedAnswer": { "@type": "Answer", "text": "댓글·DM 응대를 쓸 때만 인스타그램 프로페셔널 계정을 연결하면 돼요." }
+        },
+        {
+          "@type": "Question",
+          "name": "비즈니스 AX는 스마트스토어에서만 쓸 수 있나요?",
+          "acceptedAnswer": { "@type": "Answer", "text": "첫 버전을 스마트스토어에 적용하고 있어요. 다른 서비스에 적용하고 싶으시면 상담에서 알려 주세요." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">본문으로 건너뛰기</a>
+
+<header class="site-header wrap">
+  <a class="logo" href="/" aria-label="AnyBaek 홈">AnyBaek</a>
+  <nav class="nav" aria-label="주 메뉴">
+    <a href="#business">사업</a>
+    <a href="#level">직급</a>
+    <a href="#approach">일하는 방식</a>
+    <a href="#faq">자주 묻는 질문</a>
+    <a href="#contact">문의</a>
+  </nav>
+</header>
+
+<main id="main">
+
+<section class="hero wrap" aria-labelledby="hero-title">
+  <h1 id="hero-title" class="display">일을 맡길 수 있는<br>AI 직원을<br>만들어요.</h1>
+  <div class="hero-cta">
+    <a class="btn btn--primary" href="#contact">상담 요청하기</a>
+    <div class="cursor-hint" aria-hidden="true">
+      <svg width="40" height="40" viewBox="0 0 24 24"><path d="M4 3l15 9-6.5 1.6L10 20z"/></svg>
+      <span>여기를 누르면 상담을 요청할 수 있어요</span>
+    </div>
+  </div>
+  <p class="statement">AnyBaek은 일을 대신하는 AI 에이전트로 AX(AI 전환)를 도와요. 고객 응대를 맡는 <a class="c-satbyul" href="#satbyul">샛별</a>, 사이트에서 길을 안내하는 <a class="c-pointer" href="#helper">AI 웹 이용 도우미</a>, 재고와 주문을 챙기는 <a class="c-ax" href="#ax">비즈니스 AX</a>를 준비하고 있어요.</p>
+</section>
+
+<div id="business">
+
+<section id="satbyul" class="chapter wrap" aria-labelledby="satbyul-title">
+  <p class="chapter-name"><span class="dot bg-satbyul" aria-hidden="true"></span><strong>샛별</strong><span class="status">준비 중</span></p>
+  <h2 id="satbyul-title" class="h1">고객 응대를 맡는 AI 직원</h2>
+  <div class="split">
+    <div class="copy">
+      <p class="lead">댓글, DM, 스토어 문의에 대신 답하는 AI 직원이에요. 주문 내역을 직접 조회해서 답변을 만들어 보내고, 사람이 봐야 하는 문의만 담당자에게 넘겨요. 첫 버전은 인스타그램과 스마트스토어에 적용하고 있어요.</p>
+      <ul class="features">
+        <li><strong>댓글·DM 응대</strong><span>밤에도 주말에도 문의에 바로 답해요.</span></li>
+        <li><strong>주문 조회와 답변</strong><span>전용 도구(MCP Tool)로 주문과 배송 상태를 직접 확인해요.</span></li>
+        <li><strong>담당자에게 넘기기</strong><span>판단이 필요한 문의는 인박스에 모아 드려요.</span></li>
+      </ul>
+      <a class="text-link c-satbyul" href="https://satbyul.com/">satbyul.com 둘러보기</a>
+    </div>
+    <figure class="stage">
+      <figcaption class="caption">예시 화면</figcaption>
+      <div class="msg">
+        <span class="caption">고객 문의</span>
+        <p class="bubble bubble--in">주문한 상품 언제 오나요?</p>
+      </div>
+      <ul class="worklog">
+        <li><span class="bg-satbyul" aria-hidden="true"></span>주문 내역을 조회했어요</li>
+        <li><span class="bg-satbyul" aria-hidden="true"></span>배송 중인 걸 확인했어요</li>
+      </ul>
+      <div class="msg msg--end">
+        <span class="caption caption--satbyul">샛별이 보낸 답변</span>
+        <p class="bubble bubble--satbyul">안녕하세요, 고객님. 주문하신 상품은 지금 배송 중이에요. 곧 받아 보실 수 있어요.</p>
+      </div>
+      <div class="msg msg--gap">
+        <span class="caption">고객 문의</span>
+        <p class="bubble bubble--in">배송지를 바꾸고 싶어요</p>
+      </div>
+      <ul class="worklog">
+        <li><span class="bg-ink" aria-hidden="true"></span>사람이 봐야 하는 문의라 담당자에게 넘겼어요</li>
+      </ul>
+    </figure>
+  </div>
+</section>
+
+<section id="helper" class="chapter wrap" aria-labelledby="helper-title">
+  <p class="chapter-name"><span class="dot bg-pointer" aria-hidden="true"></span><strong>AI 웹 이용 도우미</strong><span class="status">준비 중</span></p>
+  <h2 id="helper-title" class="h1">어디를 눌러야 할지, 곁에서 알려 드려요</h2>
+
+  <figure class="stage stage--wide">
+    <div class="browser">
+      <div class="browser-bar">
+        <span class="browser-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <figcaption class="browser-url">예시 화면</figcaption>
+      </div>
+      <div class="demo-menu">
+        <span class="demo-site">예시 구청</span>
+        <span class="demo-menu-item">민원 신청</span>
+        <span class="demo-menu-item is-target">증명서 발급<svg aria-hidden="true" width="52" height="52" viewBox="0 0 24 24"><path d="M4 3l15 9-6.5 1.6L10 20z"/></svg></span>
+        <span class="demo-menu-item">세금 납부</span>
+        <span class="demo-menu-item">시설 예약</span>
+      </div>
+      <div class="demo-body">
+        <div class="demo-list">
+          <p class="demo-list-title">자주 찾는 서비스</p>
+          <span>전입신고</span>
+          <span>여권 재발급 신청</span>
+          <span>대형 폐기물 배출 신고</span>
+          <span>주정차 위반 과태료 조회</span>
+        </div>
+        <div class="demo-chat">
+          <p class="bubble bubble--ask"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>등본 떼려면 어디로 가야 해요?</p>
+          <div class="bubble bubble--guide">
+            <p class="guide-main">주민등록등본은 '증명서 발급' 메뉴에 있어요. 위쪽 메뉴에서 두 번째를 눌러 보세요.</p>
+            <p class="guide-sub">누르시면 다음에 할 일도 이어서 알려 드릴게요.</p>
+            <div class="chips">
+              <span class="chip chip--solid">다시 설명해 주세요</span>
+              <span class="chip chip--line">메뉴를 못 찾겠어요</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </figure>
+
+  <div class="split split--after">
+    <div class="copy copy--wide">
+      <p class="lead">공공기관 사이트나 어르신이 자주 찾는 사이트에 붙이는 AI 도우미예요. 하고 싶은 일을 말하면 어느 메뉴로 가야 하는지, 다음에 무엇을 하면 되는지 한 단계씩 친절하게 안내해요.</p>
+      <a class="text-link c-pointer" href="#contact">도입 상담 요청하기</a>
+    </div>
+    <ul class="features features--col">
+      <li><strong>채팅과 음성</strong><span>글로 묻거나 말로 물어보면 바로 답해요.</span></li>
+      <li><strong>메뉴 안내</strong><span>가야 할 메뉴와 눌러야 할 곳을 화면에서 직접 가리켜요.</span></li>
+      <li><strong>단계별 도움</strong><span>한 번에 한 단계씩, 일을 마칠 때까지 곁에서 도와요.</span></li>
+      <li><strong>관리자 페이지</strong><span>기관 담당자가 화면별 안내 내용을 직접 다듬어요.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="ax" class="chapter wrap" aria-labelledby="ax-title">
+  <p class="chapter-name"><span class="dot bg-ax" aria-hidden="true"></span><strong>비즈니스 AX</strong><span class="status">준비 중</span></p>
+  <h2 id="ax-title" class="h1">물어보면 답하고, 시키면 처리해요</h2>
+  <div class="split split--reverse">
+    <figure class="stage">
+      <figcaption class="caption">예시 화면, 대리급 AI 직원일 때</figcaption>
+      <p class="bubble bubble--me">재고 마감 여부 확인하고, 모자라면 주문 넣어 줘</p>
+      <ul class="worklog">
+        <li><span class="bg-ax" aria-hidden="true"></span>재고를 확인했어요</li>
+        <li><span class="bg-ax" aria-hidden="true"></span>모자란 상품을 찾았어요</li>
+        <li><span class="bg-ax" aria-hidden="true"></span>발주서를 만들었어요</li>
+      </ul>
+      <div class="bubble bubble--agent">
+        <p>재고가 모자란 상품이 두 개 있어요. 평소 주문량대로 발주서를 만들어 뒀어요. 이대로 주문을 넣을까요?</p>
+        <div class="chips">
+          <span class="chip chip--ax">주문 넣기</span>
+          <span class="chip chip--outline">발주서 고치기</span>
+        </div>
+      </div>
+      <p class="bubble bubble--me bubble--gap">이번 달 환불은 얼마나 됐어?</p>
+      <ul class="worklog">
+        <li><span class="ring-ax" aria-hidden="true"></span>환불 내역을 모으고 있어요</li>
+      </ul>
+    </figure>
+    <div class="copy">
+      <p class="lead">사업 운영을 함께하는 AI 에이전트예요. 재고, 주문, 환불 같은 업무 데이터를 직접 확인하고, 필요한 일은 이어서 처리해요. 쓰고 계신 서비스에 전용 도구(MCP Tool)를 만들어 연결하고, 첫 버전은 스마트스토어에 적용하고 있어요.</p>
+      <ul class="prompts">
+        <li><strong>"재고 마감 여부 확인하고, 모자라면 주문 넣어 줘"</strong><span>재고를 확인하고 발주까지 이어서 처리해요.</span></li>
+        <li><strong>"이번 달 환불은 얼마나 됐어?"</strong><span>주문과 환불 내역을 모아 바로 답해요.</span></li>
+        <li><strong>"경쟁사에서 인기 있는 제품 알려 줘"</strong><span>시장을 조사해서 정리해 드려요.</span></li>
+      </ul>
+      <a class="text-link c-ax" href="#contact">도입 상담 요청하기</a>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<section id="level" class="chapter wrap" aria-labelledby="level-title">
+  <h2 id="level-title" class="h1">AI 직원의 직급을<br>고를 수 있어요</h2>
+  <p class="lead level-lead">맡기고 싶은 만큼만 맡기세요. 직급에 따라 알아서 하는 일과 확인받고 하는 일이 달라져요.</p>
+  <div class="levels">
+    <div class="level">
+      <h3 class="level-name">대리급</h3>
+      <p class="level-say">고객 응대, 보고서 작성은 알아서 척척 해요. 주문처럼 결재가 필요한 일은 확인을 받고 진행해요.</p>
+      <dl class="level-spec">
+        <div><dt>알아서 해요</dt><dd>고객 응대, 보고서 작성</dd></div>
+        <div><dt>확인받고 해요</dt><dd>주문처럼 결재가 필요한 일</dd></div>
+      </dl>
+    </div>
+    <div class="level">
+      <h3 class="level-name">부장급</h3>
+      <p class="level-say">주문도 알아서 척척 해내는 고급 인력이에요. 다만 어디까지 맡길지 업무 범위를 정해 둘 수 있어요.</p>
+      <dl class="level-spec">
+        <div><dt>알아서 해요</dt><dd>고객 응대, 보고서 작성, 주문</dd></div>
+        <div class="is-center"><dt>업무 범위</dt><dd class="level-limit">주문 최고 금액 <span>50만 원</span></dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section id="approach" class="chapter wrap" aria-labelledby="approach-title">
+  <div class="twocol">
+    <h2 id="approach-title" class="h2">일은 AI 직원이,<br>결정은 사람이 해요</h2>
+    <div class="principles">
+      <div>
+        <h3 class="h3">쓰던 곳에 그대로 붙여요</h3>
+        <p>새 시스템으로 옮길 필요가 없어요. 지금 쓰는 인스타그램 계정, 스토어, 운영 중인 사이트에 전용 도구(MCP Tool)를 만들어 연결해요.</p>
+      </div>
+      <div>
+        <h3 class="h3">평소 쓰는 말로 시켜요</h3>
+        <p>메뉴를 찾아 들어갈 필요 없이 직원에게 말하듯 시키면 돼요. AI 직원이 필요한 정보를 직접 찾아보고 일을 이어서 해요.</p>
+      </div>
+      <div>
+        <h3 class="h3">사람이 볼 일은 사람에게 넘겨요</h3>
+        <p>반복되는 일은 AI 직원이 처리하고, 판단이 필요한 문의와 결정은 담당자에게 넘겨요.</p>
+      </div>
+    </div>
+  </div>
+  <div class="twocol twocol--gap">
+    <h2 class="h2">이렇게 진행해요</h2>
+    <ol class="steps">
+      <li>
+        <span class="step-no" aria-hidden="true">1</span>
+        <h3>상담</h3>
+        <p>어떤 일을 맡기고 싶은지, 지금은 누가 어떻게 하고 있는지 먼저 들어요.</p>
+      </li>
+      <li>
+        <span class="step-no" aria-hidden="true">2</span>
+        <h3>연결</h3>
+        <p>쓰고 계신 서비스에 맞춰 도구를 만들고, AI 직원이 할 일을 함께 정해요.</p>
+      </li>
+      <li>
+        <span class="step-no" aria-hidden="true">3</span>
+        <h3>운영</h3>
+        <p>쓰면서 나오는 질문과 막히는 지점을 보고 계속 고쳐요.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="faq" class="chapter chapter--last wrap" aria-labelledby="faq-title">
+  <div class="twocol">
+    <h2 id="faq-title" class="h2">자주 묻는 질문</h2>
+    <div class="faq">
+      <details open>
+        <summary><h3>AnyBaek은 무엇을 하나요?</h3><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></summary>
+        <p>AnyBaek은 일을 대신하는 AI 에이전트, 곧 AI 직원을 만들어 사업자와 기관의 AX(AI 전환)를 도와요. 고객 응대를 맡는 샛별, 사이트 이용을 안내하는 AI 웹 이용 도우미, 재고와 주문을 챙기는 비즈니스 AX 세 가지를 준비하고 있어요.</p>
+      </details>
+      <details>
+        <summary><h3>지금 바로 쓸 수 있나요?</h3><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></summary>
+        <p>세 사업 모두 출시를 준비하고 있어요. 샛별은 satbyul.com에서 가입 없이 먼저 둘러볼 수 있고, AI 웹 이용 도우미와 비즈니스 AX는 상담을 요청하시면 일정을 안내해 드려요.</p>
+      </details>
+      <details>
+        <summary><h3>AI 직원이 마음대로 주문하거나 답변을 보내지는 않나요?</h3><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></summary>
+        <p>고르신 직급에 따라 달라요. 대리급은 고객 응대와 보고서 작성은 알아서 하고, 주문처럼 결재가 필요한 일은 확인을 받아요. 부장급은 주문도 알아서 하지만, 주문 최고 금액 같은 업무 범위를 미리 정해 둘 수 있어요.</p>
+      </details>
+      <details>
+        <summary><h3>AI 웹 이용 도우미를 넣으려면 사이트를 새로 만들어야 하나요?</h3><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></summary>
+        <p>아니요. 지금 운영 중인 사이트에 도우미를 설치하는 방식이에요. 어떤 화면에서 무엇을 안내할지는 기관 담당자와 함께 정해요.</p>
+      </details>
+      <details>
+        <summary><h3>샛별을 쓰려면 인스타그램 계정이 꼭 필요한가요?</h3><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></summary>
+        <p>댓글·DM 응대를 쓸 때만 인스타그램 프로페셔널 계정을 연결하면 돼요.</p>
+      </details>
+      <details>
+        <summary><h3>비즈니스 AX는 스마트스토어에서만 쓸 수 있나요?</h3><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></summary>
+        <p>첫 버전을 스마트스토어에 적용하고 있어요. 다른 서비스에 적용하고 싶으시면 상담에서 알려 주세요.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="contact" aria-labelledby="contact-title">
+  <div class="wrap">
+    <h2 id="contact-title" class="display display--contact">어떤 일을<br>맡기고 싶으세요?</h2>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <p>도입을 검토하는 기관, 함께 써 볼 판매자와 운영자 모두 환영해요. 남겨 주시면 직접 연락드릴게요.</p>
+        <a class="contact-mail" href="mailto:contact@anybaek.com">contact@anybaek.com</a>
+      </div>
+      <form id="contact-form" class="form" action="/api/contact" method="post" novalidate>
+        <div class="form-row">
+          <div class="field">
+            <label for="f-name">이름</label>
+            <input id="f-name" name="name" type="text" autocomplete="name" required maxlength="80">
+          </div>
+          <div class="field">
+            <label for="f-tel">연락처 <span class="optional">(선택)</span></label>
+            <input id="f-tel" name="phone" type="tel" autocomplete="tel" maxlength="40">
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-email">이메일</label>
+          <input id="f-email" name="email" type="email" autocomplete="email" required maxlength="200">
+        </div>
+        <div class="field">
+          <label for="f-biz">관심 있는 사업</label>
+          <select id="f-biz" name="interest">
+            <option>샛별 (고객 응대 AI 직원)</option>
+            <option>AI 웹 이용 도우미</option>
+            <option>비즈니스 AX (업무 에이전트)</option>
+            <option>아직 잘 모르겠어요</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-msg">맡기고 싶은 일</label>
+          <textarea id="f-msg" name="message" rows="4" required maxlength="4000"></textarea>
+        </div>
+        <div class="hp" aria-hidden="true">
+          <label for="f-website">이 칸은 비워 두세요</label>
+          <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <button class="btn btn--submit" type="submit">상담 요청 보내기</button>
+        <p id="form-status" class="form-status" role="status" aria-live="polite">보내신 내용은 contact@anybaek.com으로 전달돼요.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer wrap">
+  <p class="footer-brand"><span class="logo">AnyBaek</span><span class="copyright">Copyright © 2026 AnyBaek. All rights reserved.</span></p>
+  <nav class="footer-nav" aria-label="바닥 메뉴">
+    <a href="#satbyul">샛별</a>
+    <a href="#helper">AI 웹 이용 도우미</a>
+    <a href="#ax">비즈니스 AX</a>
+    <a href="#faq">자주 묻는 질문</a>
+    <a href="#contact">문의</a>
+  </nav>
+</footer>
+
+<script src="/main.js" defer></script>
+</body>
+</html>

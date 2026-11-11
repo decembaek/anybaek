@@ -1,0 +1,44 @@
+# AnyBaek — 검색 엔진과 AI 검색 모두 읽어도 됩니다.
+User-agent: *
+Allow: /
+Disallow: /api/
+
+# AI 검색·답변 엔진 (GEO)
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# 국내 검색
+User-agent: Yeti
+Allow: /
+
+User-agent: Daum
+Allow: /
+
+Sitemap: https://anybaek.com/sitemap.xml

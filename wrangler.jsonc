@@ -1,0 +1,31 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "anybaek",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-11-01",
+
+  // public/ 폴더를 정적 파일로 내보낸다. /api/* 만 Worker 가 먼저 받는다.
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*"]
+  },
+
+  // Cloudflare Email Service. anybaek.com 을 Email Sending 에 등록해야 실제로 보내진다.
+  "send_email": [{ "name": "EMAIL" }],
+
+  "vars": {
+    "CONTACT_TO": "contact@anybaek.com",
+    "CONTACT_FROM": "noreply@anybaek.com"
+  },
+
+  "observability": { "enabled": true }
+
+  // 도메인을 이 Worker 로 옮길 준비가 되면 아래 주석을 풀고 다시 배포한다.
+  // 지금 anybaek.com 에 연결된 기존 사이트가 이 Worker 로 바뀐다.
+  // "routes": [
+  //   { "pattern": "anybaek.com", "custom_domain": true },
+  //   { "pattern": "www.anybaek.com", "custom_domain": true }
+  // ]
+}
