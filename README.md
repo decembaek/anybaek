@@ -38,7 +38,7 @@ npx wrangler login
 npm run deploy
 ```
 
-처음 배포하면 `anybaek.<계정>.workers.dev` 주소로 올라갑니다. 여기서 페이지와 폼을 확인한 뒤 도메인을 연결하세요.
+처음 배포하면 `anybaek-next-web.<계정>.workers.dev` 주소로 올라갑니다. 여기서 페이지와 폼을 확인한 뒤 도메인을 연결하세요.
 
 ### 1. 메일 보내기 설정 (Cloudflare Email Service)
 
