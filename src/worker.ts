@@ -28,6 +28,12 @@ interface Env {
   EMAIL: SendEmailBinding;
   /** 상담 요청을 받을 주소 */
   CONTACT_TO: string;
+  /**
+   * (선택) 실제로 메일을 받을 주소. 대시보드에서 Secret 으로 넣는다.
+   * 무료 요금제는 계정에 인증된 받는 주소로만 보낼 수 있어서,
+   * contact@anybaek.com 이 전달되는 개인 메일함 주소를 여기에 넣으면 된다.
+   */
+  CONTACT_INBOX?: string;
   /** 보내는 주소. Email Service 에 등록한 도메인의 주소여야 한다. */
   CONTACT_FROM: string;
 }
@@ -68,9 +74,9 @@ export default {
 
 async function handleContact(request: Request, env: Env, url: URL): Promise<Response> {
   const wantsJson = (request.headers.get('content-type') ?? '').includes('application/json');
-  const reply = (ok: boolean, message: string, status: number): Response =>
+  const reply = (ok: boolean, message: string, status: number, code?: string): Response =>
     wantsJson
-      ? json({ ok, message }, status)
+      ? json(code ? { ok, message, code } : { ok, message }, status)
       : Response.redirect(`${url.origin}/?sent=${ok ? 1 : 0}#contact`, 303);
 
   // 다른 사이트에서 보낸 요청은 받지 않는다.
@@ -103,7 +109,7 @@ async function handleContact(request: Request, env: Env, url: URL): Promise<Resp
 
   try {
     await env.EMAIL.send({
-      to: env.CONTACT_TO,
+      to: env.CONTACT_INBOX || env.CONTACT_TO,
       from: { email: env.CONTACT_FROM, name: 'AnyBaek 상담 요청' },
       replyTo: { email: input.email, name: input.name },
       subject,
@@ -113,7 +119,8 @@ async function handleContact(request: Request, env: Env, url: URL): Promise<Resp
   } catch (error) {
     const code = (error as { code?: string }).code ?? 'UNKNOWN';
     console.error('contact email failed', code, (error as Error).message);
-    return reply(false, FALLBACK, 502);
+    // 오류 코드를 응답에 같이 실어 보낸다. (원인 확인용. 예: E_SENDER_DOMAIN_NOT_AVAILABLE)
+    return reply(false, FALLBACK, 502, code);
   }
 
   return reply(true, '상담 요청을 보냈어요. 확인하는 대로 연락드릴게요.', 200);

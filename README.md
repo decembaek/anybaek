@@ -47,9 +47,10 @@ npm run deploy
 1. anybaek.com이 Cloudflare DNS를 쓰고 있어야 합니다.
 2. Cloudflare 대시보드 → Compute → Email Service → Email Sending → **Onboard Domain**에서 anybaek.com을 등록합니다. SPF, DKIM, DMARC 레코드가 자동으로 추가됩니다.
 3. 받는 주소 `contact@anybaek.com`이 실제로 메일을 받을 수 있어야 합니다. Email Routing으로 개인 메일함에 전달하도록 해 두었다면 그 설정이 켜져 있는지 확인하세요.
-4. 보내는 주소는 `noreply@anybaek.com`입니다. 바꾸려면 `wrangler.jsonc`의 `CONTACT_FROM`을 고칩니다. 등록한 도메인의 주소여야 합니다.
+4. 무료 요금제에서 `E_RECIPIENT_NOT_ALLOWED`로 실패하면, 대시보드 → Worker → Settings → Variables and Secrets에 `CONTACT_INBOX`라는 **Secret**을 만들고 `contact@anybaek.com`이 전달되는 실제 메일함 주소(Email Routing에 인증된 받는 주소)를 넣으세요. 이 값이 있으면 그 주소로 보냅니다.
+5. 보내는 주소는 `noreply@anybaek.com`입니다. 바꾸려면 `wrangler.jsonc`의 `CONTACT_FROM`을 고칩니다. 등록한 도메인의 주소여야 합니다.
 
-요금제 참고: Cloudflare 문서에 따르면 계정에 인증된 받는 주소로 보내는 것은 무료 요금제에서도 되고, 임의의 주소로 보내려면 Workers Paid가 필요합니다. 배포 후 폼을 한 번 보내 보고, 실패하면 `npx wrangler tail`로 오류 코드(`E_RECIPIENT_NOT_ALLOWED`, `E_SENDER_DOMAIN_NOT_AVAILABLE` 등)를 확인하세요.
+요금제 참고: Cloudflare 문서에 따르면 계정에 인증된 받는 주소로 보내는 것은 무료 요금제에서도 되고, 임의의 주소로 보내려면 Workers Paid가 필요합니다. 배포 후 폼을 한 번 보내 보고, 실패하면 응답의 `code` 값이나 `npx wrangler tail`로 오류 코드(`E_RECIPIENT_NOT_ALLOWED`, `E_SENDER_DOMAIN_NOT_AVAILABLE` 등)를 확인하세요.
 
 ### 2. 도메인 연결
 
