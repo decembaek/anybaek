@@ -5,37 +5,14 @@
  * 이 Worker는 /api/* 요청만 처리한다. (wrangler.jsonc 의 run_worker_first)
  *
  *   POST /api/contact  →  상담 요청을 Cloudflare Email Service 로 CONTACT_TO 에 보낸다.
+ *   /api/admin/*       →  관리자 페이지(public/admin/)용 API. src/admin.ts
  */
 
-interface EmailAddress {
-  email: string;
-  name?: string;
-}
+import { handleAdmin, type AdminEnv } from './admin';
+import { EMAIL_PATTERN, escapeHtml, json, sameHost } from './shared';
 
-interface SendEmailBinding {
-  send(message: {
-    to: string | EmailAddress;
-    from: string | EmailAddress;
-    subject: string;
-    text?: string;
-    html?: string;
-    replyTo?: string | EmailAddress;
-  }): Promise<{ messageId: string }>;
-}
-
-interface Env {
+interface Env extends AdminEnv {
   ASSETS: { fetch(request: Request): Promise<Response> };
-  EMAIL: SendEmailBinding;
-  /** 상담 요청을 받을 주소 */
-  CONTACT_TO: string;
-  /**
-   * (선택) 실제로 메일을 받을 주소. 대시보드에서 Secret 으로 넣는다.
-   * 무료 요금제는 계정에 인증된 받는 주소로만 보낼 수 있어서,
-   * contact@anybaek.com 이 전달되는 개인 메일함 주소를 여기에 넣으면 된다.
-   */
-  CONTACT_INBOX?: string;
-  /** 보내는 주소. Email Service 에 등록한 도메인의 주소여야 한다. */
-  CONTACT_FROM: string;
 }
 
 interface ContactInput {
@@ -49,7 +26,6 @@ interface ContactInput {
 }
 
 const LIMITS = { name: 80, email: 200, phone: 40, interest: 80, message: 4000 } as const;
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const FALLBACK = '보내지 못했어요. 잠시 뒤에 다시 시도하거나 contact@anybaek.com으로 메일을 보내 주세요.';
 
 export default {
@@ -61,6 +37,10 @@ export default {
         return json({ ok: false, message: 'POST 요청만 받아요.' }, 405, { Allow: 'POST' });
       }
       return handleContact(request, env, url);
+    }
+
+    if (url.pathname.startsWith('/api/admin/')) {
+      return handleAdmin(request, env, url);
     }
 
     if (url.pathname.startsWith('/api/')) {
@@ -107,14 +87,21 @@ async function handleContact(request: Request, env: Env, url: URL): Promise<Resp
     ['맡기고 싶은 일', input.message],
   ];
 
+  // 관리자 페이지의 메일 쓰기 화면으로 바로 가는 링크. 값은 # 뒤에 두어 서버 로그에 남지 않게 한다.
+  const replyUrl = `${url.origin}/admin/#${new URLSearchParams({
+    to: input.email,
+    name: input.name,
+    subject: `Re: AnyBaek 상담 요청${input.interest ? ` · ${input.interest}` : ''}`,
+  })}`;
+
   try {
     await env.EMAIL.send({
       to: env.CONTACT_INBOX || env.CONTACT_TO,
       from: { email: env.CONTACT_FROM, name: 'AnyBaek 상담 요청' },
       replyTo: { email: input.email, name: input.name },
       subject,
-      text: rows.map(([label, value]) => `${label}\n${value}`).join('\n\n'),
-      html: renderHtml(rows),
+      text: rows.map(([label, value]) => `${label}\n${value}`).join('\n\n') + `\n\n답장하기: ${replyUrl}`,
+      html: renderHtml(rows, replyUrl),
     });
   } catch (error) {
     const code = (error as { code?: string }).code ?? 'UNKNOWN';
@@ -124,14 +111,6 @@ async function handleContact(request: Request, env: Env, url: URL): Promise<Resp
   }
 
   return reply(true, '상담 요청을 보냈어요. 확인하는 대로 연락드릴게요.', 200);
-}
-
-function sameHost(origin: string, host: string): boolean {
-  try {
-    return new URL(origin).host === host;
-  } catch {
-    return false;
-  }
 }
 
 async function readInput(request: Request, isJson: boolean): Promise<ContactInput> {
@@ -166,7 +145,7 @@ function validate(input: ContactInput): string | null {
   return null;
 }
 
-function renderHtml(rows: Array<[string, string]>): string {
+function renderHtml(rows: Array<[string, string]>, replyUrl: string): string {
   const body = rows
     .map(
       ([label, value]) =>
@@ -174,26 +153,8 @@ function renderHtml(rows: Array<[string, string]>): string {
         `<p style="margin:0 0 20px;font-size:16px;white-space:pre-wrap">${escapeHtml(value)}</p>`,
     )
     .join('');
-  return `<div style="font-family:sans-serif;color:#17191f;line-height:1.6">${body}</div>`;
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function json(data: unknown, status = 200, headers: Record<string, string> = {}): Response {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      'content-type': 'application/json; charset=utf-8',
-      'cache-control': 'no-store',
-      'x-content-type-options': 'nosniff',
-      ...headers,
-    },
-  });
+  const button =
+    `<p style="margin:8px 0 0"><a href="${escapeHtml(replyUrl)}" ` +
+    `style="display:inline-block;background:#17191f;color:#ffffff;padding:12px 20px;border-radius:12px;font-weight:700;text-decoration:none">관리자 페이지에서 답장하기</a></p>`;
+  return `<div style="font-family:sans-serif;color:#17191f;line-height:1.6">${body}${button}</div>`;
 }

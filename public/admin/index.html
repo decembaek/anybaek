@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>AnyBaek 관리자</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/fonts/WantedSansVariable.css">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body class="admin">
+
+<header class="admin-bar">
+  <a class="admin-brand" href="/">AnyBaek</a>
+  <span class="admin-tag">관리자</span>
+  <button id="logout" class="admin-link" type="button" hidden>로그아웃</button>
+</header>
+
+<main class="admin-main">
+
+  <p id="loading" class="caption">불러오는 중이에요…</p>
+
+  <!-- 로그인 -->
+  <section id="login-view" class="admin-card" hidden aria-labelledby="login-title">
+    <h1 id="login-title" class="admin-title">관리자 로그인</h1>
+    <form id="login-form" class="form" novalidate>
+      <div class="field">
+        <label for="l-password">비밀번호</label>
+        <input id="l-password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+      <button class="btn btn--submit" type="submit">로그인</button>
+      <p id="login-status" class="form-status" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <!-- 메일 쓰기 -->
+  <section id="compose-view" class="admin-card admin-card--wide" hidden aria-labelledby="compose-title">
+    <h1 id="compose-title" class="admin-title">고객에게 메일 보내기</h1>
+    <p class="caption">보내는 사람: <strong id="from-label"></strong> · 고객이 답장하면 contact@anybaek.com으로 와요.</p>
+
+    <form id="compose-form" class="form" novalidate>
+      <div class="form-row">
+        <div class="field">
+          <label for="c-to">받는 사람 이메일</label>
+          <input id="c-to" name="to" type="email" required maxlength="200" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="c-name">받는 사람 이름 <span class="optional">(선택)</span></label>
+          <input id="c-name" name="name" type="text" maxlength="80" autocomplete="off">
+        </div>
+      </div>
+      <div class="field">
+        <label for="c-subject">제목</label>
+        <input id="c-subject" name="subject" type="text" required maxlength="200">
+      </div>
+      <div class="field">
+        <label for="c-message">본문</label>
+        <textarea id="c-message" name="message" rows="14" required maxlength="20000"></textarea>
+      </div>
+      <label class="admin-check">
+        <input id="c-copy" name="copy" type="checkbox" checked>
+        내 메일함에 사본 받기 (숨은참조)
+      </label>
+      <button class="btn btn--submit" type="submit">메일 보내기</button>
+      <p id="compose-status" class="form-status" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <section id="error-view" class="admin-card" hidden>
+    <h1 class="admin-title">관리자 페이지를 열 수 없어요</h1>
+    <p id="error-text"></p>
+  </section>
+
+</main>
+
+<script src="/admin/admin.js"></script>
+</body>
+</html>

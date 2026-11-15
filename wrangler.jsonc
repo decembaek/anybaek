@@ -17,8 +17,17 @@
 
   "vars": {
     "CONTACT_TO": "contact@anybaek.com",
-    "CONTACT_FROM": "noreply@anybaek.com"
+    "CONTACT_FROM": "noreply@anybaek.com",
+    // 관리자 페이지(/admin/)에서 고객에게 보낼 때의 보내는 주소와 이름
+    "ADMIN_FROM": "contact@anybaek.com",
+    "ADMIN_FROM_NAME": "AnyBaek"
   },
+  // 관리자 비밀번호는 Secret 으로 넣는다: npx wrangler secret put ADMIN_PASSWORD
+
+  // 관리자 로그인 시도 제한: IP 하나당 1분에 5번
+  "ratelimits": [
+    { "name": "LOGIN_LIMITER", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } }
+  ],
 
   "observability": { "enabled": true }
 

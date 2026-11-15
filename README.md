@@ -18,7 +18,9 @@ public/
   sitemap.xml
   llms.txt            AI 검색 엔진용 요약
   _headers            보안 헤더, 폰트 캐시
+  admin/              관리자 페이지 (고객에게 메일 보내기)
 src/worker.ts         POST /api/contact
+src/admin.ts          /api/admin/* (로그인, 메일 보내기)
 wrangler.jsonc        배포 설정
 ```
 
@@ -52,7 +54,27 @@ npm run deploy
 
 요금제 참고: Cloudflare 문서에 따르면 계정에 인증된 받는 주소로 보내는 것은 무료 요금제에서도 되고, 임의의 주소로 보내려면 Workers Paid가 필요합니다. 배포 후 폼을 한 번 보내 보고, 실패하면 응답의 `code` 값이나 `npx wrangler tail`로 오류 코드(`E_RECIPIENT_NOT_ALLOWED`, `E_SENDER_DOMAIN_NOT_AVAILABLE` 등)를 확인하세요.
 
-### 2. 도메인 연결
+### 2. 관리자 페이지 (고객에게 메일 보내기)
+
+`/admin/`에서 로그인한 뒤 고객에게 `AnyBaek <contact@anybaek.com>` 이름으로 메일을 보낼 수 있습니다.
+
+- 상담 요청 알림 메일 맨 아래 **관리자 페이지에서 답장하기** 버튼을 누르면 받는 사람·이름·제목이 채워진 채로 열립니다.
+- 고객이 답장하면 `contact@anybaek.com`(Reply-To)으로 오고, Email Routing을 거쳐 개인 메일함에 들어옵니다.
+- "내 메일함에 사본 받기"를 켜 두면 보낸 메일이 숨은참조로 `CONTACT_INBOX`(없으면 `CONTACT_TO`)에 남습니다.
+
+설정:
+
+1. 비밀번호를 Secret으로 넣습니다. 길고 추측하기 어려운 값으로 정하세요.
+   ```bash
+   npx wrangler secret put ADMIN_PASSWORD
+   ```
+   로컬에서는 `.dev.vars` 파일에 `ADMIN_PASSWORD=...` 한 줄을 적습니다. (git에 올라가지 않음)
+2. 보내는 주소·이름은 `wrangler.jsonc`의 `ADMIN_FROM`, `ADMIN_FROM_NAME`입니다.
+3. **임의의 고객 주소로 보내려면 Workers Paid 요금제가 필요합니다.** 무료 요금제에서는 계정에 인증된 주소로만 보내지므로 `E_RECIPIENT_NOT_ALLOWED`로 실패합니다.
+
+보안: 로그인 쿠키는 12시간 유지되고 `ADMIN_PASSWORD`로 서명합니다. 비밀번호를 바꾸면 모든 로그인이 풀립니다. 로그인 시도는 IP당 1분에 5번으로 제한합니다. 더 단단하게 하려면 Cloudflare Zero Trust → Access에서 `anybaek.com/admin*`과 `anybaek.com/api/admin/*`에 본인 이메일만 통과하는 정책을 추가로 거세요. (50명까지 무료)
+
+### 3. 도메인 연결
 
 `wrangler.jsonc` 맨 아래 `routes` 주석을 풀고 다시 `npm run deploy` 하면 anybaek.com과 www.anybaek.com이 이 Worker로 연결됩니다. **지금 anybaek.com에 올라가 있는 기존 사이트가 바뀌니** workers.dev 주소에서 확인을 마친 뒤에 하세요.
 
