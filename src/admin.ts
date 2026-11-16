@@ -5,18 +5,18 @@
  *   POST /api/admin/logout                 →  쿠키를 지운다.
  *   GET  /api/admin/session                →  로그인 상태와 보내는 주소를 알려 준다.
  *   POST /api/admin/send     { to, name, subject, message, copy }  →  고객에게 메일을 보낸다.
+ *   GET  /api/admin/blocks                 →  상담 폼 차단 목록을 준다.
+ *   POST /api/admin/blocks         { kind, value }  →  IP 주소(kind: ip)나 문구(kind: text)를 차단한다.
+ *   POST /api/admin/blocks/remove  { kind, value }  →  차단을 푼다.
  *
  * 비밀번호는 대시보드 Secret ADMIN_PASSWORD 에 넣는다. (로컬은 .dev.vars)
  * 로그인 쿠키는 ADMIN_PASSWORD 로 서명하므로, 비밀번호를 바꾸면 기존 로그인은 모두 풀린다.
  */
 
-import { EMAIL_PATTERN, escapeHtml, json, sameHost, type MailEnv } from './shared';
+import { EMAIL_PATTERN, escapeHtml, json, sameHost, type MailEnv, type RateLimiter } from './shared';
+import { addBlock, listBlocks, removeBlock, type SpamEnv } from './spam';
 
-interface RateLimiter {
-  limit(options: { key: string }): Promise<{ success: boolean }>;
-}
-
-export interface AdminEnv extends MailEnv {
+export interface AdminEnv extends MailEnv, SpamEnv {
   /** 관리자 비밀번호. Secret 으로 넣는다. 없으면 관리자 기능이 꺼진다. */
   ADMIN_PASSWORD?: string;
   /** 고객에게 보낼 때 쓰는 보내는 주소. Email Service 에 등록한 도메인의 주소여야 한다. */
@@ -59,6 +59,13 @@ export async function handleAdmin(request: Request, env: AdminEnv, url: URL): Pr
     case 'POST /api/admin/send':
       if (!(await isSignedIn(request, env))) return json({ ok: false, message: '다시 로그인해 주세요.' }, 401);
       return send(request, env);
+    case 'GET /api/admin/blocks':
+      if (!(await isSignedIn(request, env))) return json({ ok: false, message: '다시 로그인해 주세요.' }, 401);
+      return json({ ok: true, available: !!env.SPAM, blocks: await listBlocks(env) });
+    case 'POST /api/admin/blocks':
+    case 'POST /api/admin/blocks/remove':
+      if (!(await isSignedIn(request, env))) return json({ ok: false, message: '다시 로그인해 주세요.' }, 401);
+      return changeBlocks(request, env, url.pathname.endsWith('/remove'));
     default:
       return json({ ok: false, message: '없는 주소예요.' }, 404);
   }
@@ -127,6 +134,25 @@ async function send(request: Request, env: AdminEnv): Promise<Response> {
     const code = (error as { code?: string }).code ?? 'UNKNOWN';
     console.error('admin email failed', code, (error as Error).message);
     return json({ ok: false, message: `보내지 못했어요. (${code})`, code }, 502);
+  }
+}
+
+async function changeBlocks(request: Request, env: AdminEnv, remove: boolean): Promise<Response> {
+  let kind = '';
+  let value = '';
+  try {
+    const body = (await request.json()) as { kind?: unknown; value?: unknown };
+    kind = typeof body.kind === 'string' ? body.kind : '';
+    value = typeof body.value === 'string' ? body.value : '';
+  } catch {
+    return json({ ok: false, message: '보낸 내용을 읽지 못했어요.' }, 400);
+  }
+  try {
+    const result = remove ? await removeBlock(env, kind, value) : await addBlock(env, kind, value);
+    return json(result, result.ok ? 200 : 422);
+  } catch (error) {
+    console.error('block list write failed', String(error));
+    return json({ ok: false, message: '차단 목록을 저장하지 못했어요. 잠시 뒤에 다시 해 주세요.' }, 502);
   }
 }
 

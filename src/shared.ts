@@ -31,6 +31,10 @@ export interface MailEnv {
   CONTACT_FROM: string;
 }
 
+export interface RateLimiter {
+  limit(options: { key: string }): Promise<{ success: boolean }>;
+}
+
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function escapeHtml(value: string): string {
