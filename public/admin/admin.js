@@ -1,4 +1,4 @@
-// 관리자 페이지: 로그인하고 고객에게 메일을 보낸다. API 는 src/admin.ts
+// 관리자 페이지: 로그인하고 고객에게 메일을 보내고, 상담 폼 스팸을 차단한다. API 는 src/admin.ts
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var views = ['loading', 'login-view', 'compose-view', 'error-view'];
@@ -6,6 +6,7 @@
   function show(id) {
     views.forEach(function (v) { $(v).hidden = v !== id; });
     $('logout').hidden = id !== 'compose-view';
+    $('block-view').hidden = id !== 'compose-view';
   }
 
   function say(el, text, kind) {
@@ -29,10 +30,19 @@
   }
 
   // 상담 요청 메일의 "답장하기" 링크(#to=…&name=…&subject=…)로 들어오면 칸을 채운다.
+  // "차단하기" 링크(#block=…)로 들어오면 차단 칸을 채우고 true 를 돌려준다. 차단은 버튼을 눌러야 된다.
   function prefill() {
     var params = new URLSearchParams(location.hash.slice(1));
+    var block = params.get('block');
+    if (block) {
+      $('b-kind').value = 'ip';
+      $('b-value').value = block;
+      say($('block-status'), '상담 요청 메일에서 가져온 보낸 곳이에요. 차단하려면 아래 버튼을 눌러 주세요.', true);
+      history.replaceState(null, '', location.pathname);
+      return true;
+    }
     var to = params.get('to');
-    if (!to) return;
+    if (!to) return false;
     var name = params.get('name') || '';
     $('c-to').value = to;
     $('c-name').value = name;
@@ -43,13 +53,90 @@
     }
     // 주소창에 고객 정보가 남지 않게 지운다.
     history.replaceState(null, '', location.pathname);
+    return false;
   }
 
   function enterCompose(from) {
     $('from-label').textContent = from || '';
     show('compose-view');
-    prefill();
-    ($('c-to').value ? $('c-message') : $('c-to')).focus();
+    loadBlocks();
+    if (prefill()) {
+      $('block-view').scrollIntoView();
+      $('block-form').querySelector('button').focus();
+    } else {
+      ($('c-to').value ? $('c-message') : $('c-to')).focus();
+    }
+  }
+
+  // 로그인이 풀렸으면 로그인 화면으로 보내고 true 를 돌려준다.
+  function signedOut(data) {
+    if (data.status !== 401) return false;
+    say($('login-status'), data.message, true);
+    enterLogin();
+    return true;
+  }
+
+  var kindLabel = { ip: '보낸 곳', text: '문구' };
+
+  function renderBlocks(blocks) {
+    var list = $('block-list');
+    list.textContent = '';
+    if (!blocks.length) {
+      var empty = document.createElement('li');
+      empty.className = 'block-empty';
+      empty.textContent = '아직 차단한 것이 없어요.';
+      return list.appendChild(empty);
+    }
+    blocks.forEach(function (block) {
+      var item = document.createElement('li');
+      var kind = document.createElement('span');
+      kind.className = 'block-kind';
+      kind.textContent = kindLabel[block.kind] || block.kind;
+      var value = document.createElement('span');
+      value.className = 'block-value';
+      value.textContent = block.value;
+      var at = document.createElement('span');
+      at.className = 'block-at';
+      at.textContent = block.at || '';
+      var remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'admin-link';
+      remove.textContent = '차단 풀기';
+      remove.setAttribute('aria-label', block.value + ' 차단 풀기');
+      remove.addEventListener('click', function () {
+        remove.disabled = true;
+        changeBlocks('blocks/remove', block, block.value + ' 차단을 풀었어요.');
+      });
+      [kind, value, at, remove].forEach(function (el) { item.appendChild(el); });
+      list.appendChild(item);
+    });
+  }
+
+  function loadBlocks() {
+    api('GET', 'blocks').then(function (data) {
+      if (!data.ok) return;
+      renderBlocks(data.blocks || []);
+      if (!data.available) {
+        say($('block-status'), '차단 목록 저장소(SPAM)가 아직 연결되지 않았어요. 다시 배포하면 만들어져요.', true);
+      }
+    }).catch(function () {});
+  }
+
+  function changeBlocks(path, body, done) {
+    var status = $('block-status');
+    return api('POST', path, body).then(function (data) {
+      if (signedOut(data)) return false;
+      if (!data.ok) {
+        say(status, data.message || '저장하지 못했어요.', true);
+        return false;
+      }
+      renderBlocks(data.blocks || []);
+      say(status, done, 'ok');
+      return true;
+    }).catch(function () {
+      say(status, '서버에 연결하지 못했어요.', true);
+      return false;
+    });
   }
 
   function enterLogin() {
@@ -92,6 +179,21 @@
     api('POST', 'logout', {}).then(enterLogin);
   });
 
+  $('block-form').addEventListener('submit', function (event) {
+    event.preventDefault();
+    var button = event.target.querySelector('button');
+    var value = $('b-value').value.trim();
+    if (!value) {
+      say($('block-status'), '차단할 값을 적어 주세요.', true);
+      return $('b-value').focus();
+    }
+    button.disabled = true;
+    changeBlocks('blocks', { kind: $('b-kind').value, value: value }, value + ' 차단했어요.').then(function (ok) {
+      if (ok) $('b-value').value = '';
+      button.disabled = false;
+    });
+  });
+
   $('compose-form').addEventListener('submit', function (event) {
     event.preventDefault();
     var form = event.target;
@@ -120,10 +222,7 @@
     say(status, '');
 
     api('POST', 'send', payload).then(function (data) {
-      if (data.status === 401) {
-        say($('login-status'), data.message, true);
-        return enterLogin();
-      }
+      if (signedOut(data)) return;
       if (data.ok) {
         say(status, data.message, 'ok');
         form.reset();

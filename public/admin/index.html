@@ -68,6 +68,32 @@
     </form>
   </section>
 
+  <!-- 스팸 차단 -->
+  <section id="block-view" class="admin-card admin-card--wide" hidden aria-labelledby="block-title">
+    <h2 id="block-title" class="admin-title">상담 폼 스팸 차단</h2>
+    <p class="caption">차단한 곳에서 보냈거나, 차단한 문구가 내용·이름·이메일·연락처에 들어 있는 상담 요청은 메일로 오지 않아요. 보낸 사람에게는 보낸 것처럼 보여요.</p>
+
+    <form id="block-form" class="form" novalidate>
+      <div class="form-row">
+        <div class="field">
+          <label for="b-kind">차단할 것</label>
+          <select id="b-kind" name="kind">
+            <option value="ip">보낸 곳 (IP 주소)</option>
+            <option value="text">문구 (들어 있으면 차단)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="b-value">값</label>
+          <input id="b-value" name="value" type="text" maxlength="200" autocomplete="off">
+        </div>
+      </div>
+      <button class="btn btn--submit" type="submit">차단하기</button>
+      <p id="block-status" class="form-status" role="status" aria-live="polite"></p>
+    </form>
+
+    <ul id="block-list" class="block-list" aria-label="차단 목록"></ul>
+  </section>
+
   <section id="error-view" class="admin-card" hidden>
     <h1 class="admin-title">관리자 페이지를 열 수 없어요</h1>
     <p id="error-text"></p>

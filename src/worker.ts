@@ -5,11 +5,13 @@
  * 이 Worker는 /api/* 요청만 처리한다. (wrangler.jsonc 의 run_worker_first)
  *
  *   POST /api/contact  →  상담 요청을 Cloudflare Email Service 로 CONTACT_TO 에 보낸다.
+ *                         보내기 전에 스팸인지 본다. src/spam.ts
  *   /api/admin/*       →  관리자 페이지(public/admin/)용 API. src/admin.ts
  */
 
 import { handleAdmin, type AdminEnv } from './admin';
 import { EMAIL_PATTERN, escapeHtml, json, sameHost } from './shared';
+import { remember, screen, senderOf } from './spam';
 
 interface Env extends AdminEnv {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -78,6 +80,16 @@ async function handleContact(request: Request, env: Env, url: URL): Promise<Resp
   const problem = validate(input);
   if (problem) return reply(false, problem, 422);
 
+  // 차단한 곳, 같은 내용 반복, 너무 잦은 전송을 걸러 낸다.
+  const sender = senderOf(request);
+  const verdict = await screen(env, sender, input);
+  if (verdict.action !== 'pass') {
+    console.log('contact blocked', verdict.reason, sender.key || '(ip 없음)', sender.country);
+    return verdict.action === 'drop'
+      ? reply(true, '상담 요청을 보냈어요. 확인하는 대로 연락드릴게요.', 200)
+      : reply(false, verdict.message, 429);
+  }
+
   const subject = `[AnyBaek 상담 요청] ${input.name}${input.interest ? ` · ${input.interest}` : ''}`;
   const rows: Array<[string, string]> = [
     ['이름', input.name],
@@ -85,6 +97,10 @@ async function handleContact(request: Request, env: Env, url: URL): Promise<Resp
     ['연락처', input.phone || '(적지 않음)'],
     ['관심 있는 사업', input.interest || '(고르지 않음)'],
     ['맡기고 싶은 일', input.message],
+    [
+      '보낸 곳',
+      `${sender.ip || '알 수 없음'}${sender.country ? ` (${sender.country})` : ''} · 최근 24시간 동안 ${verdict.sentToday + 1}번째`,
+    ],
   ];
 
   // 관리자 페이지의 메일 쓰기 화면으로 바로 가는 링크. 값은 # 뒤에 두어 서버 로그에 남지 않게 한다.
@@ -93,6 +109,8 @@ async function handleContact(request: Request, env: Env, url: URL): Promise<Resp
     name: input.name,
     subject: `Re: AnyBaek 상담 요청${input.interest ? ` · ${input.interest}` : ''}`,
   })}`;
+  // 스팸일 때 누르는 링크. 관리자 페이지의 차단 칸에 보낸 곳이 채워진 채로 열린다.
+  const blockUrl = sender.key ? `${url.origin}/admin/#${new URLSearchParams({ block: sender.key })}` : '';
 
   try {
     await env.EMAIL.send({
@@ -100,8 +118,11 @@ async function handleContact(request: Request, env: Env, url: URL): Promise<Resp
       from: { email: env.CONTACT_FROM, name: 'AnyBaek 상담 요청' },
       replyTo: { email: input.email, name: input.name },
       subject,
-      text: rows.map(([label, value]) => `${label}\n${value}`).join('\n\n') + `\n\n답장하기: ${replyUrl}`,
-      html: renderHtml(rows, replyUrl),
+      text:
+        rows.map(([label, value]) => `${label}\n${value}`).join('\n\n') +
+        `\n\n답장하기: ${replyUrl}` +
+        (blockUrl ? `\n스팸이면 이 보낸 곳 차단하기: ${blockUrl}` : ''),
+      html: renderHtml(rows, replyUrl, blockUrl),
     });
   } catch (error) {
     const code = (error as { code?: string }).code ?? 'UNKNOWN';
@@ -109,6 +130,8 @@ async function handleContact(request: Request, env: Env, url: URL): Promise<Resp
     // 오류 코드를 응답에 같이 실어 보낸다. (원인 확인용. 예: E_SENDER_DOMAIN_NOT_AVAILABLE)
     return reply(false, FALLBACK, 502, code);
   }
+
+  await remember(env, sender, input, verdict.sentToday);
 
   return reply(true, '상담 요청을 보냈어요. 확인하는 대로 연락드릴게요.', 200);
 }
@@ -145,7 +168,7 @@ function validate(input: ContactInput): string | null {
   return null;
 }
 
-function renderHtml(rows: Array<[string, string]>, replyUrl: string): string {
+function renderHtml(rows: Array<[string, string]>, replyUrl: string, blockUrl: string): string {
   const body = rows
     .map(
       ([label, value]) =>
@@ -156,5 +179,8 @@ function renderHtml(rows: Array<[string, string]>, replyUrl: string): string {
   const button =
     `<p style="margin:8px 0 0"><a href="${escapeHtml(replyUrl)}" ` +
     `style="display:inline-block;background:#17191f;color:#ffffff;padding:12px 20px;border-radius:12px;font-weight:700;text-decoration:none">관리자 페이지에서 답장하기</a></p>`;
-  return `<div style="font-family:sans-serif;color:#17191f;line-height:1.6">${body}${button}</div>`;
+  const block = blockUrl
+    ? `<p style="margin:16px 0 0;font-size:14px"><a href="${escapeHtml(blockUrl)}" style="color:#5a606b">스팸이면 이 보낸 곳 차단하기</a></p>`
+    : '';
+  return `<div style="font-family:sans-serif;color:#17191f;line-height:1.6">${body}${button}${block}</div>`;
 }
