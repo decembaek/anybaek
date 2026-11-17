@@ -5,15 +5,17 @@
  * 이 Worker는 /api/* 요청만 처리한다. (wrangler.jsonc 의 run_worker_first)
  *
  *   POST /api/contact  →  상담 요청을 Cloudflare Email Service 로 CONTACT_TO 에 보낸다.
- *                         보내기 전에 스팸인지 본다. src/spam.ts
+ *                         보내기 전에 사람이 보낸 것인지(src/turnstile.ts), 스팸인지(src/spam.ts) 본다.
+ *   GET  /api/contact/config  →  폼이 쓸 설정(사람 확인용 사이트 키)을 준다.
  *   /api/admin/*       →  관리자 페이지(public/admin/)용 API. src/admin.ts
  */
 
 import { handleAdmin, type AdminEnv } from './admin';
 import { EMAIL_PATTERN, escapeHtml, json, sameHost } from './shared';
 import { remember, screen, senderOf } from './spam';
+import { checkHuman, turnstileSiteKey, type TurnstileEnv } from './turnstile';
 
-interface Env extends AdminEnv {
+interface Env extends AdminEnv, TurnstileEnv {
   ASSETS: { fetch(request: Request): Promise<Response> };
 }
 
@@ -25,6 +27,8 @@ interface ContactInput {
   message: string;
   /** 사람 눈에는 안 보이는 칸. 채워져 있으면 봇으로 본다. */
   website: string;
+  /** Turnstile 이 브라우저에서 만들어 준 사람 확인 토큰 */
+  humanToken: string;
 }
 
 const LIMITS = { name: 80, email: 200, phone: 40, interest: 80, message: 4000 } as const;
@@ -39,6 +43,10 @@ export default {
         return json({ ok: false, message: 'POST 요청만 받아요.' }, 405, { Allow: 'POST' });
       }
       return handleContact(request, env, url);
+    }
+
+    if (url.pathname === '/api/contact/config') {
+      return json({ ok: true, turnstileSiteKey: turnstileSiteKey(env) });
     }
 
     if (url.pathname.startsWith('/api/admin/')) {
@@ -80,8 +88,21 @@ async function handleContact(request: Request, env: Env, url: URL): Promise<Resp
   const problem = validate(input);
   if (problem) return reply(false, problem, 422);
 
-  // 차단한 곳, 같은 내용 반복, 너무 잦은 전송을 걸러 낸다.
   const sender = senderOf(request);
+
+  // 자동 프로그램이 아니라 사람이 브라우저에서 보낸 것인지 확인한다.
+  const human = await checkHuman(env, input.humanToken, sender.ip);
+  if (!human.ok) {
+    console.log('contact blocked', `not-human:${human.reason}`, sender.key || '(ip 없음)', sender.country);
+    return reply(
+      false,
+      '사람인지 확인하지 못했어요. 다시 보내 보시고, 계속 안 되면 contact@anybaek.com으로 메일을 보내 주세요.',
+      403,
+      'HUMAN_CHECK',
+    );
+  }
+
+  // 차단한 곳, 같은 내용 반복, 너무 잦은 전송을 걸러 낸다.
   const verdict = await screen(env, sender, input);
   if (verdict.action !== 'pass') {
     console.log('contact blocked', verdict.reason, sender.key || '(ip 없음)', sender.country);
@@ -153,6 +174,7 @@ async function readInput(request: Request, isJson: boolean): Promise<ContactInpu
     interest: pick('interest'),
     message: pick('message'),
     website: pick('website'),
+    humanToken: pick('cf-turnstile-response'),
   };
 }
 
