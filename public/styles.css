@@ -242,6 +242,9 @@ svg { flex-shrink: 0; }
 .field select { padding: 0 14px; }
 .field textarea { padding: 16px 18px; resize: vertical; min-height: 140px; }
 .field [aria-invalid="true"] { outline: 3px solid var(--ink); outline-offset: 2px; }
+/* 사람 확인(Turnstile) 칸. 확인 칸이 나타나기 전에는 높이가 0 이라, 폼의 간격(22px)만큼 당겨서 자리를 없앤다. */
+.human-check { margin-top: -22px; }
+.human-check.is-shown { margin-top: 0; }
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .btn--submit { height: 64px; margin-top: 6px; background: var(--ink); color: var(--on-ink); }
 .btn--submit:hover { background: #000000; }

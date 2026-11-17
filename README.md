@@ -22,6 +22,7 @@ public/
 src/worker.ts         POST /api/contact
 src/admin.ts          /api/admin/* (로그인, 메일 보내기, 스팸 차단 목록)
 src/spam.ts           상담 폼 스팸 차단
+src/turnstile.ts      상담 폼 사람 확인 (Cloudflare Turnstile)
 wrangler.jsonc        배포 설정
 ```
 
@@ -131,4 +132,29 @@ ChatGPT, Claude, Perplexity, Google AI 같은 답변 엔진이 AnyBaek을 정확
 
 차단 목록과 횟수는 KV(`SPAM`)에 저장합니다. `wrangler.jsonc`에 id 없이 적어 두었으므로 `npm run deploy` 할 때 wrangler가 KV를 만들어 연결합니다. KV를 읽고 쓰지 못하면 막지 않고 메일을 보냅니다.
 
-그래도 스팸이 오면(자동 프로그램이 IP와 내용을 매번 바꾸는 경우) Cloudflare Turnstile을 폼에 추가하세요.
+### 사람 확인 (Cloudflare Turnstile)
+
+자동 프로그램이 IP와 내용을 매번 바꿔 가며 보내는 스팸은 위 방법으로 다 막을 수 없어서, 브라우저에서 사람이 보낸 것인지 Cloudflare Turnstile로 확인합니다. (`src/turnstile.ts`) **키 두 개를 넣어야 켜집니다.** 넣기 전에는 지금까지와 똑같이 동작합니다.
+
+켜는 방법:
+
+1. Cloudflare 대시보드 → **Turnstile** → **Add widget**. Hostname에 `anybaek.com`을 넣고(workers.dev 주소에서도 쓰려면 그 주소도 추가) Widget Mode는 **Managed**로 둡니다.
+2. 만들면 **Site Key**와 **Secret Key**가 나옵니다. 대시보드 → Workers → anybaek-next-web → Settings → Variables and Secrets에서 둘 다 **Secret** 종류로 넣습니다. (Text 종류로 넣으면 다음 배포 때 지워집니다.)
+   - `TURNSTILE_SITE_KEY`: Site Key
+   - `TURNSTILE_SECRET_KEY`: Secret Key
+
+   터미널에서는 `npx wrangler secret put TURNSTILE_SITE_KEY`, `npx wrangler secret put TURNSTILE_SECRET_KEY` 입니다.
+3. 사이트에서 상담 요청을 한 번 보내 메일이 오는지 확인합니다.
+
+끄려면 두 Secret 중 하나를 지웁니다.
+
+동작:
+
+- 폼이 화면에 가까워지면 확인을 미리 시작합니다. 대부분은 화면에 아무것도 보이지 않고, Cloudflare가 의심스럽다고 본 경우에만 버튼 위에 확인 칸이 나타납니다.
+- 확인이 끝나기 전에 보내기를 누르면, 확인이 끝나는 대로 자동으로 보냅니다.
+- 서버는 확인 토큰이 없거나 가짜인 요청을 거절합니다. (`npx wrangler tail`에서 `contact blocked not-human:…`)
+- Cloudflare에 확인을 물어보지 못했거나 Secret Key가 틀린 경우에는 상담 요청을 잃지 않도록 통과시키고 오류 로그(`turnstile …`)를 남깁니다.
+- 사람 확인이 켜져 있으면 자바스크립트를 끈 브라우저에서는 폼을 보낼 수 없습니다. 메일로 보내 달라는 안내가 나옵니다.
+- `public/_headers`의 Content-Security-Policy에서 `challenges.cloudflare.com`의 스크립트와 프레임을 허용했습니다.
+
+로컬에서 켜 보려면 `.dev.vars`에 Cloudflare의 테스트용 키를 넣습니다. (항상 통과: `TURNSTILE_SITE_KEY=1x00000000000000000000AA`, `TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA`)
