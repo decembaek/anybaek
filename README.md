@@ -134,27 +134,33 @@ ChatGPT, Claude, Perplexity, Google AI 같은 답변 엔진이 AnyBaek을 정확
 
 ### 사람 확인 (Cloudflare Turnstile)
 
-자동 프로그램이 IP와 내용을 매번 바꿔 가며 보내는 스팸은 위 방법으로 다 막을 수 없어서, 브라우저에서 사람이 보낸 것인지 Cloudflare Turnstile로 확인합니다. (`src/turnstile.ts`) **키 두 개를 넣어야 켜집니다.** 넣기 전에는 지금까지와 똑같이 동작합니다.
+자동 프로그램이 IP와 내용을 매번 바꿔 가며 보내는 스팸은 위 방법으로 다 막을 수 없어서, 브라우저에서 사람이 보낸 것인지 Cloudflare Turnstile로 확인합니다. (`src/turnstile.ts`) **위젯의 비밀 키를 Secret으로 넣어야 켜집니다.** 넣기 전에는 사람 확인 없이 동작합니다.
+
+설정값:
+
+| 값 | 어디에 | 설명 |
+| --- | --- | --- |
+| 사이트 키 | `public/index.html`의 `#human-check`에 `data-sitekey` | 공개해도 되는 값. 위젯을 바꾸면 여기를 고칩니다. |
+| 비밀 키 | Secret `TURNSTILE_SECRET_KEY` | 이 값이 있으면 사람 확인이 켜집니다. 저장소에 올리지 않습니다. |
+| 호스트 이름 | `wrangler.jsonc`의 `TURNSTILE_HOSTNAMES` | 토큰이 만들어진 곳으로 인정할 주소. 쉼표로 구분하고 `localhost`는 넣지 않습니다. |
+| 폼 이름 | `index.html`의 `data-action`, `src/worker.ts`의 `HUMAN_CHECK_ACTION` | 둘이 같아야 합니다. (`contact`) |
 
 켜는 방법:
 
-1. Cloudflare 대시보드 → **Turnstile** → **Add widget**. Hostname에 `anybaek.com`을 넣고(workers.dev 주소에서도 쓰려면 그 주소도 추가) Widget Mode는 **Managed**로 둡니다.
-2. 만들면 **Site Key**와 **Secret Key**가 나옵니다. 대시보드 → Workers → anybaek-next-web → Settings → Variables and Secrets에서 둘 다 **Secret** 종류로 넣습니다. (Text 종류로 넣으면 다음 배포 때 지워집니다.)
-   - `TURNSTILE_SITE_KEY`: Site Key
-   - `TURNSTILE_SECRET_KEY`: Secret Key
-
-   터미널에서는 `npx wrangler secret put TURNSTILE_SITE_KEY`, `npx wrangler secret put TURNSTILE_SECRET_KEY` 입니다.
+1. Cloudflare 대시보드 → Turnstile → 위젯 → Settings에서 **Secret Key**를 복사합니다. 위젯의 Hostname에 `anybaek.com`이 들어 있어야 합니다.
+2. 대시보드 → Workers & Pages → anybaek-next-web → Settings → Variables and Secrets에서 `TURNSTILE_SECRET_KEY`라는 이름의 **Secret**으로 넣습니다. 터미널에서는 `npx wrangler secret put TURNSTILE_SECRET_KEY` 입니다. 비밀 키는 채팅이나 저장소에 붙여 넣지 않습니다.
 3. 사이트에서 상담 요청을 한 번 보내 메일이 오는지 확인합니다.
 
-끄려면 두 Secret 중 하나를 지웁니다.
+끄려면 `TURNSTILE_SECRET_KEY`를 지웁니다.
 
 동작:
 
 - 폼이 화면에 가까워지면 확인을 미리 시작합니다. 대부분은 화면에 아무것도 보이지 않고, Cloudflare가 의심스럽다고 본 경우에만 버튼 위에 확인 칸이 나타납니다.
 - 확인이 끝나기 전에 보내기를 누르면, 확인이 끝나는 대로 자동으로 보냅니다.
-- 서버는 확인 토큰이 없거나 가짜인 요청을 거절합니다. (`npx wrangler tail`에서 `contact blocked not-human:…`)
-- Cloudflare에 확인을 물어보지 못했거나 Secret Key가 틀린 경우에는 상담 요청을 잃지 않도록 통과시키고 오류 로그(`turnstile …`)를 남깁니다.
+- 서버는 Cloudflare(siteverify)가 통과시켰고, 토큰의 폼 이름(action)이 `contact`이고, 토큰이 만들어진 주소(hostname)가 `TURNSTILE_HOSTNAMES`에 있을 때만 받습니다.
+- **켜져 있는 동안에는 확인하지 못한 요청을 모두 거절합니다.** 토큰이 없거나 가짜인 경우뿐 아니라, Cloudflare에 물어보지 못했거나 비밀 키·호스트 이름 설정이 틀린 경우도 거절합니다. 거절된 사람에게는 contact@anybaek.com으로 메일을 보내 달라고 안내합니다. 그래서 비밀 키를 넣거나 바꾼 뒤에는 꼭 한 번 보내 보세요.
+- 거절한 이유는 `npx wrangler tail`이나 Workers Logs에서 `contact blocked not-human:…`으로 찾습니다. (예: `invalid-input-secret`은 비밀 키가 틀림, `wrong-hostname:…`은 `TURNSTILE_HOSTNAMES`에 없는 주소에서 보냄)
 - 사람 확인이 켜져 있으면 자바스크립트를 끈 브라우저에서는 폼을 보낼 수 없습니다. 메일로 보내 달라는 안내가 나옵니다.
 - `public/_headers`의 Content-Security-Policy에서 `challenges.cloudflare.com`의 스크립트와 프레임을 허용했습니다.
 
-로컬에서 켜 보려면 `.dev.vars`에 Cloudflare의 테스트용 키를 넣습니다. (항상 통과: `TURNSTILE_SITE_KEY=1x00000000000000000000AA`, `TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA`)
+로컬(`npm run dev`)에서는 `.dev.vars`에 `TURNSTILE_SECRET_KEY`가 없으므로 꺼져 있습니다. Cloudflare의 테스트용 키는 폼 이름과 주소를 돌려주지 않아서 서버 검사를 통과하지 못하므로, 켜진 상태는 배포된 사이트에서 확인합니다.

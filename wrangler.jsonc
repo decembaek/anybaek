@@ -20,10 +20,12 @@
     "CONTACT_FROM": "noreply@anybaek.com",
     // 관리자 페이지(/admin/)에서 고객에게 보낼 때의 보내는 주소와 이름
     "ADMIN_FROM": "contact@anybaek.com",
-    "ADMIN_FROM_NAME": "AnyBaek"
+    "ADMIN_FROM_NAME": "AnyBaek",
+    // 상담 폼 사람 확인(Turnstile) 토큰이 만들어진 곳으로 인정할 호스트 이름. localhost 는 넣지 않는다.
+    "TURNSTILE_HOSTNAMES": "anybaek.com,www.anybaek.com"
   },
   // 관리자 비밀번호는 Secret 으로 넣는다: npx wrangler secret put ADMIN_PASSWORD
-  // 상담 폼 사람 확인(Turnstile)은 Secret 두 개를 넣으면 켜진다: TURNSTILE_SITE_KEY, TURNSTILE_SECRET_KEY (README 참고)
+  // 상담 폼 사람 확인(Turnstile)은 위젯의 비밀 키를 Secret 으로 넣으면 켜진다: npx wrangler secret put TURNSTILE_SECRET_KEY (README 참고)
 
   // 관리자 로그인 시도 제한: IP 하나당 1분에 5번
   // 상담 폼 연속 전송 제한: IP 하나당 1분에 2번

@@ -6,14 +6,14 @@
  *
  *   POST /api/contact  →  상담 요청을 Cloudflare Email Service 로 CONTACT_TO 에 보낸다.
  *                         보내기 전에 사람이 보낸 것인지(src/turnstile.ts), 스팸인지(src/spam.ts) 본다.
- *   GET  /api/contact/config  →  폼이 쓸 설정(사람 확인용 사이트 키)을 준다.
+ *   GET  /api/contact/config  →  폼이 쓸 설정(사람 확인이 켜져 있는지)을 준다.
  *   /api/admin/*       →  관리자 페이지(public/admin/)용 API. src/admin.ts
  */
 
 import { handleAdmin, type AdminEnv } from './admin';
 import { EMAIL_PATTERN, escapeHtml, json, sameHost } from './shared';
 import { remember, screen, senderOf } from './spam';
-import { checkHuman, turnstileSiteKey, type TurnstileEnv } from './turnstile';
+import { checkHuman, humanCheckOn, type TurnstileEnv } from './turnstile';
 
 interface Env extends AdminEnv, TurnstileEnv {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -32,6 +32,8 @@ interface ContactInput {
 }
 
 const LIMITS = { name: 80, email: 200, phone: 40, interest: 80, message: 4000 } as const;
+/** 사람 확인 토큰에 담기는 이 폼의 이름. public/index.html 의 data-action 과 같아야 한다. */
+const HUMAN_CHECK_ACTION = 'contact';
 const FALLBACK = '보내지 못했어요. 잠시 뒤에 다시 시도하거나 contact@anybaek.com으로 메일을 보내 주세요.';
 
 export default {
@@ -46,7 +48,7 @@ export default {
     }
 
     if (url.pathname === '/api/contact/config') {
-      return json({ ok: true, turnstileSiteKey: turnstileSiteKey(env) });
+      return json({ ok: true, humanCheck: humanCheckOn(env) });
     }
 
     if (url.pathname.startsWith('/api/admin/')) {
@@ -91,7 +93,7 @@ async function handleContact(request: Request, env: Env, url: URL): Promise<Resp
   const sender = senderOf(request);
 
   // 자동 프로그램이 아니라 사람이 브라우저에서 보낸 것인지 확인한다.
-  const human = await checkHuman(env, input.humanToken, sender.ip);
+  const human = await checkHuman(env, input.humanToken, sender.ip, HUMAN_CHECK_ACTION);
   if (!human.ok) {
     console.log('contact blocked', `not-human:${human.reason}`, sender.key || '(ip 없음)', sender.country);
     return reply(
