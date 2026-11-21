@@ -41,7 +41,8 @@
     return found;
   }
 
-  // 사람 확인(Cloudflare Turnstile). 서버에 키가 설정되어 있을 때만 켜진다. 서버 쪽은 src/turnstile.ts
+  // 사람 확인(Cloudflare Turnstile). 서버에 비밀 키가 설정되어 있을 때만 켜진다. 서버 쪽은 src/turnstile.ts
+  // 사이트 키와 폼 이름(action)은 index.html 의 #human-check 에 data-sitekey, data-action 으로 적혀 있다.
   // 확인이 끝나면 Turnstile 이 폼 안에 cf-turnstile-response 라는 숨은 칸으로 토큰을 넣어 준다.
   var human = {
     siteKey: '',     // 비어 있으면 사람 확인을 쓰지 않는다.
@@ -80,6 +81,7 @@
       }
       human.widget = window.turnstile.render(human.box, {
         sitekey: human.siteKey,
+        action: human.box.getAttribute('data-action') || undefined,
         language: 'ko',
         // 대부분은 화면에 아무것도 안 보이고, 직접 눌러야 할 때만 확인 칸이 나타난다.
         appearance: 'interaction-only',
@@ -109,8 +111,9 @@
   var ready = fetch('/api/contact/config', { headers: { 'Accept': 'application/json' } })
     .then(function (res) { return res.json(); })
     .then(function (data) {
-      if (!data.turnstileSiteKey || !human.box) return;
-      human.siteKey = data.turnstileSiteKey;
+      var siteKey = human.box && human.box.getAttribute('data-sitekey');
+      if (!data.humanCheck || !siteKey) return;
+      human.siteKey = siteKey;
       // 폼이 화면에 가까워지면 미리 확인을 시작해서, 보낼 때 기다리지 않게 한다.
       if (!('IntersectionObserver' in window)) return loadHumanCheck();
       var observer = new IntersectionObserver(function (entries) {
